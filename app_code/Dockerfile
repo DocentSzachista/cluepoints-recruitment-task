@@ -1,26 +1,33 @@
+# Build stage
+FROM python:3.13-slim AS builder
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN pip install --upgrade pip
+
+COPY requirements.txt .
+
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
+
+# Runtime stage
 FROM python:3.13-slim
 
 WORKDIR /app
 
-# Prevents Python from writing pyc files to disk
 ENV PYTHONDONTWRITEBYTECODE=1
-#Prevents Python from buffering stdout and stderr
 ENV PYTHONUNBUFFERED=1
 
-# Upgrade pip
-RUN pip install --upgrade pip
+COPY --from=builder /install /usr/local
 
-# Copy the Django project  and install dependencies
-COPY requirements.txt  /app/
+COPY . .
 
-# run this command to install all dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the Django project to the container
-COPY . /app/
-
-# Expose the Django port
 EXPOSE 8000
 
-# Run Django’s development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Collect static files that will be later consumed by nginx proxy
+RUN python manage.py collectstatic --noinput
+
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "mysite.wsgi:application"]
