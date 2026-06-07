@@ -1,0 +1,27 @@
+image:
+  repository: your-registry/poll-app
+  tag: latest
+
+postgres:
+  enabled: true
+  database: appdb
+  username: app
+  password: secret
+  storageSize: 5Gi
+  port: 5432
+
+externalDatabase:
+  host: my-db.example.com
+
+
+app:
+  secretKey: "sample-key"
+  debug: false
+  allowedHosts: "*"
+
+service:
+  type: ClusterIP
+  port: 8000
+
+nginx:
+  servicePort: 80

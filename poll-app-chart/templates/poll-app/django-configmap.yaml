@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-config
+data:
+  DEBUG: {{ .Values.app.debug | quote }}
+  DJANGO_ALLOWED_HOSTS: {{ .Values.app.allowedHosts | quote }}
+  DATABASE_PORT: {{ .Values.postgres.port | quote }}
+  {{- if .Values.postgres.enabled }}
+  DATABASE_HOST: "postgres-rw"
+  {{- else }}
+  DATABASE_HOST: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}

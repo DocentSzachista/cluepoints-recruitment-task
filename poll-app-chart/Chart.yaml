@@ -1,0 +1,13 @@
+apiVersion: v2
+name: poll-app-chart
+description: A helm chart for poll django app
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+
+
+dependencies:
+  - name: postgres
+    version: "0.26.0"
+    repository: "https://cloudnative-pg.github.io/charts"
+    condition: postgres.enabled
